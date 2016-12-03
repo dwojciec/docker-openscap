@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: scanner
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: scanner
+      image: ${NAME}-${TAG}
+    name: ${NAME}
+  spec:
+    tags:
+    - from:
+        kind: DockerImage
+        name: ${IMAGE}
+      name: ${TAG}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: scanner
+      image: ${NAME}-${TAG}
+      tool: openscap
+    name: scanner-${NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: scanner:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      type: None
+    strategy:
+      customStrategy:
+        env:
+        - name: IMAGE
+          value: ${IMAGE}
+        - name: EMAIL_RESULT
+          value: ${EMAIL}
+        exposeDockerSocket: true
+        from:
+          kind: ImageStreamTag
+          name: openscap:latest
+      type: Custom
+    triggers:
+    - type: ConfigChange
+parameters:
+- description: The image name
+  name: NAME
+  required: true
+  value: origin
+- description: The image tag
+  name: TAG
+  required: true
+  value: latest
+- description: The image fqdn
+  name: IMAGE
+  required: true
+  value: docker.io/openshift/origin:latest
+- description: Emailaddress where resulting report should be sent to
+  name: EMAIL
+  required: true
+  value: sterburg@redhat.com
