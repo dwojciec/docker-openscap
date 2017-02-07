@@ -10,7 +10,6 @@ RUN yum install -y \
         --enablerepo=rhel-7-server-rpms \
         --enablerepo=rhel-7-server-extras-rpms \
         --enablerepo=rhel-7-server-optional-rpms \
-        --enablerepo=EPEL \
 	openssl \
 	openscap-utils \
 	openscap-scanner \
